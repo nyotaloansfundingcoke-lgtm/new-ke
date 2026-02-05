@@ -41,12 +41,14 @@ export function LoanSelection({ userData, onPaymentInitiated }: LoanSelectionPro
         : userData.phoneNumber;
 
       const payload = {
-        api_key: "MGPYQeo8SNJp",
-        email: "loans@kenyanloanschapchap.co.ke",
+        api_key: "MGPY1EvRts3I", // Sandbox test key
+        email: "megapaysandboxtest@gmail.com",
         amount: selectedLoan.fee.toString(),
         msisdn: formattedPhone,
         reference: `LOAN-${userData.idNumber}-${selectedLoan.amount}`,
       };
+
+      console.log("Initiating STK push with payload:", payload);
 
       const response = await fetch("https://megapay.co.ke/backend/v1/initiatestk", {
         method: "POST",
@@ -56,9 +58,18 @@ export function LoanSelection({ userData, onPaymentInitiated }: LoanSelectionPro
         body: JSON.stringify(payload),
       });
 
+      console.log("Response status:", response.status);
       const data = await response.json();
+      console.log("Payment Response:", data);
 
       if (data.success || data.status === "success") {
+        toast({
+          title: "Payment request sent!",
+          description: "Check your phone for the M-Pesa prompt.",
+        });
+        onPaymentInitiated(selectedLoan, data.transaction_request_id || "");
+      } else if (data.success === "200" || data.massage) {
+        // MegaPay returns success: "200" according to docs
         toast({
           title: "Payment request sent!",
           description: "Check your phone for the M-Pesa prompt.",
@@ -71,7 +82,7 @@ export function LoanSelection({ userData, onPaymentInitiated }: LoanSelectionPro
       console.error("Payment error:", error);
       toast({
         title: "Payment failed",
-        description: "Please try again or contact support.",
+        description: error instanceof Error ? error.message : "Please try again or contact support.",
         variant: "destructive",
       });
     } finally {
