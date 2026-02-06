@@ -53,8 +53,8 @@ export function LoanSelection({ userData, onPaymentInitiated }: LoanSelectionPro
 
       // LIVE API payload - Updated with your actual API key and merchant email
       const payload = {
-        api_key: "MGPYQeo8SNJp", // Your live API key
-        email: "collinskiptoo230@gmail.com", // MUST be the email for YOUR MegaPay merchant account
+        api_key: "", // Your live API key
+        email: "", // MUST be the email for YOUR MegaPay merchant account
         amount: selectedLoan.fee.toString(),
         msisdn: formattedPhone,
         reference: `LOAN-${Date.now()}-${userData.idNumber}-${selectedLoan.amount}`, // Added timestamp for uniqueness
